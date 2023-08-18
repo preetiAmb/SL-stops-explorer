@@ -14,29 +14,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8000;
-const API_KEY = '5da196d47f8f4e5facdb68d2e25b9eae';
-app.get('/top-bus-lines', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const API_KEY = "8187c5241b65440b8e9abab96da2ce45";
+app.use((0, cors_1.default)());
+app.get("/top-bus-lines", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield (0, node_fetch_1.default)(`https://api.sl.se/api2/LineData.json?model=stop&key=${API_KEY}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch data');
+        const linesResponse = yield (0, node_fetch_1.default)(`https://api.sl.se/api2/LineData.json?model=line&key=${API_KEY}`);
+        if (!linesResponse.ok) {
+            throw new Error('Failed to fetch lines data');
         }
-        const data = yield response.json();
-        console.log(data.ResponseData);
-        if (!data || !data.ResponseData || !data.ResponseData.Result) {
-            throw new Error('Invalid API response');
+        const linesData = yield linesResponse.json();
+        const lines = linesData.ResponseData.Result;
+        const stopsResponse = yield (0, node_fetch_1.default)(`https://api.sl.se/api2/LineData.json?model=stop&key=${API_KEY}`);
+        if (!stopsResponse.ok) {
+            throw new Error('Failed to fetch stops data');
         }
-        const busStops = data.ResponseData.Result.map((busStop) => ({
-            id: busStop.StopPointNumber,
-            name: busStop.StopPointName,
-        }));
-        res.json(busStops);
+        const stopsData = yield stopsResponse.json();
+        const stops = stopsData.ResponseData.Result;
+        const lineStops = {};
+        stops.forEach((stop) => {
+            stop.StopPointNumber.split(',').forEach((lineNumber) => {
+                if (!lineStops[lineNumber]) {
+                    lineStops[lineNumber] = [];
+                }
+                lineStops[lineNumber].push(stop.StopPointName);
+            });
+        });
+        const sortedLineNumbers = Object.keys(lineStops).sort((a, b) => lineStops[b].length - lineStops[a].length);
+        const top10LineNumbers = sortedLineNumbers.slice(0, 10);
+        const top10LinesWithStops = top10LineNumbers.map((lineNumber) => {
+            const line = lines.find((line) => line.LineNumber === lineNumber);
+            const stops = lineStops[lineNumber];
+            return {
+                lineNumber: lineNumber,
+                // numStops: stops.length,
+                stops: stops,
+            };
+        });
+        res.json(top10LinesWithStops);
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'An error occurred' });
+        res.status(500).json({ error: "An error occurred" });
     }
 }));
 app.listen(PORT, () => {

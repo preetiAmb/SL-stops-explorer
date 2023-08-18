@@ -1,43 +1,94 @@
-import express from 'express';
-import fetch from 'node-fetch';
+import express from "express";
+import fetch from "node-fetch";
+import cors from "cors";
 
-interface BusStop {
-  id: string;
-  name: string;
+interface Stop {
+  StopPointNumber: string;
+  StopPointName: string;
+  LocationNorthingCoordinate: string;
+  LocationEastingCoordinate: string;
+  ZoneShortName: string;
+  StopAreaTypeCode: string;
+  LastModifiedUtcDateTime: string;
+  ExistsFromDate: string;
+}
+
+interface Line {
+  LineNumber: string;
+  TransportMode: string;
+  DefaultTransportMode: string;
+  TransportModeCode: string;
+  LineTypeId: number;
+  NumStops: number;
+  Stops: Stop[];
+  TransportAuthorityName: string;
+  GeometryRevisionId: number;
+  LastModifiedUtcDateTime: string;
+  ExistsFromDate: string;
 }
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-const API_KEY = '5da196d47f8f4e5facdb68d2e25b9eae';
+const API_KEY = "8187c5241b65440b8e9abab96da2ce45";
 
-app.get('/top-bus-lines', async (req, res) => {
+app.use(cors());
+
+app.get("/top-bus-lines", async (req, res) => {
   try {
-    const response = await fetch(
+    const linesResponse = await fetch(
+      `https://api.sl.se/api2/LineData.json?model=line&key=${API_KEY}`
+    );
+    if (!linesResponse.ok) {
+      throw new Error('Failed to fetch lines data');
+    }
+    const linesData: {
+      ResponseData: { Result: Line[] };
+    } = await linesResponse.json();
+    const lines: Line[] = linesData.ResponseData.Result;
+
+    const stopsResponse = await fetch(
       `https://api.sl.se/api2/LineData.json?model=stop&key=${API_KEY}`
     );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
+    if (!stopsResponse.ok) {
+      throw new Error('Failed to fetch stops data');
     }
+    const stopsData: {
+      ResponseData: { Result: Stop[] };
+    } = await stopsResponse.json();
+    const stops: Stop[] = stopsData.ResponseData.Result;
 
-    const data = await response.json();
+    const lineStops: { [lineNumber: string]: string[] } = {};
+    stops.forEach((stop) => {
+      stop.StopPointNumber.split(',').forEach((lineNumber) => {
+        if (!lineStops[lineNumber]) {
+          lineStops[lineNumber] = [];
+        }
+        lineStops[lineNumber].push(stop.StopPointName);
+      });
+    });
 
-    console.log(data.ResponseData)
+    const sortedLineNumbers = Object.keys(lineStops).sort(
+      (a, b) => lineStops[b].length - lineStops[a].length
+    );
 
-    if (!data || !data.ResponseData || !data.ResponseData.Result) {
-      throw new Error('Invalid API response');
-    }
+    const top10LineNumbers = sortedLineNumbers.slice(0, 10);
 
-    const busStops: BusStop[] = data.ResponseData.Result.map((busStop: any) => ({
-      id: busStop.StopPointNumber,
-      name: busStop.StopPointName,
-    }));
+    const top10LinesWithStops = top10LineNumbers.map((lineNumber) => {
+      const line = lines.find((line) => line.LineNumber === lineNumber);
+      const stops = lineStops[lineNumber];
 
-    res.json(busStops);
+      return {
+        lineNumber: lineNumber,
+        // numStops: stops.length,
+        stops: stops,
+      };
+    });
+
+    res.json(top10LinesWithStops);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: "An error occurred" });
   }
 });
 
