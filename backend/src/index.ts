@@ -30,7 +30,7 @@ interface Line {
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-const API_KEY = "8187c5241b65440b8e9abab96da2ce45";
+const API_KEY = process.env.API_KEY;
 
 app.use(cors());
 
