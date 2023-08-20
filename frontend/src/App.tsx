@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  Container,
+  Typography,
+  Paper,
+  createTheme,
+  ThemeProvider,
+} from "@mui/material";
+import BusStopsList from "./components/BusStopsList";
+import { SelectedBusStopProvider } from "../src/context/SelectBusStopContext";
+import "./App.css";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: '#f5f5f5',
+      main: '#eeeeee',
+      dark: '#bdbdbd',
+      contrastText: '#fff',
+    }
+  },
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <SelectedBusStopProvider>
+        <Container maxWidth="md">
+          <BusStopsList isLoading={true} />
+        </Container>
+      </SelectedBusStopProvider>
+    </ThemeProvider>
   );
 }
 
