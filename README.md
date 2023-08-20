@@ -23,4 +23,4 @@ To run the project, follow these steps:
 
 1. Clone the repository.
 2. Install dependencies for both the backend and frontend:
-3. Start the backend and frontend by running npm run dev
+3. Start the backend and frontend by running npm run dev from the backend directory
