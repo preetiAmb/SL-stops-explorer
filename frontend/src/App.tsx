@@ -1,14 +1,12 @@
 import React from "react";
 import {
   Container,
-  Typography,
-  Paper,
   createTheme,
   ThemeProvider,
 } from "@mui/material";
 import BusStopsList from "./components/BusStopsList";
+import { BusStop } from "./BusStopType";
 import { SelectedBusStopProvider } from "../src/context/SelectBusStopContext";
-import "./App.css";
 
 const theme = createTheme({
   palette: {
@@ -21,12 +19,17 @@ const theme = createTheme({
   },
 });
 
+const defaultTopCommonBusStops: BusStop[] = [
+  { lineNumber: "304", stops: ["Ropsten"] },
+  { lineNumber: "306", stops: ["Slussen"] },
+];
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <SelectedBusStopProvider>
         <Container maxWidth="md">
-          <BusStopsList isLoading={true} />
+          <BusStopsList isLoading={true} topCommonBusStops={defaultTopCommonBusStops}/>
         </Container>
       </SelectedBusStopProvider>
     </ThemeProvider>

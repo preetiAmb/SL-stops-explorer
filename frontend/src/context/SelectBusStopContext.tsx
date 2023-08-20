@@ -34,6 +34,7 @@ import React, {
         setIsLoading(true);
         const response = await fetch('http://localhost:8000/top-bus-lines');
         const data = await response.json();
+        console.log(data)
         setTopCommonBusStops(data);
         localStorage.setItem('busStopData', JSON.stringify(data));
       } catch (error) {

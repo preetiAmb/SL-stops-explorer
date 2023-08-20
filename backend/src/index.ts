@@ -80,7 +80,7 @@ app.get("/top-bus-lines", async (req, res) => {
 
       return {
         lineNumber: lineNumber,
-        // numStops: stops.length,
+        numStops: stops.length,
         stops: stops,
       };
     });

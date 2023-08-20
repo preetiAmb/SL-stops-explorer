@@ -44,8 +44,8 @@ const BusStopsList: React.FC<BusStopsListProps>= () => {
 
   if (isLoading) {
     return (
-      <LoadingContainer>
-        <CircularProgress data-testid="loading-spinner"/>
+      <LoadingContainer data-testid="loading-spinner">
+        <CircularProgress />
       </LoadingContainer>
     );
   }

@@ -7,8 +7,6 @@ export interface BusLine {
   export interface BusStop {
     lineNumber: string;
     stops: string[];
-    name: string;
-    frequency: number;
   }
   
   export interface Stop {
@@ -25,5 +23,6 @@ export interface BusLine {
 
   export interface BusStopsListProps {
     isLoading: boolean;
+    topCommonBusStops: BusStop[];
   }
   

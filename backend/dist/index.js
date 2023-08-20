@@ -49,7 +49,7 @@ app.get("/top-bus-lines", (req, res) => __awaiter(void 0, void 0, void 0, functi
             const stops = lineStops[lineNumber];
             return {
                 lineNumber: lineNumber,
-                // numStops: stops.length,
+                numStops: stops.length,
                 stops: stops,
             };
         });
