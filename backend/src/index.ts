@@ -1,31 +1,7 @@
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
-
-interface Stop {
-  StopPointNumber: string;
-  StopPointName: string;
-  LocationNorthingCoordinate: string;
-  LocationEastingCoordinate: string;
-  ZoneShortName: string;
-  StopAreaTypeCode: string;
-  LastModifiedUtcDateTime: string;
-  ExistsFromDate: string;
-}
-
-interface Line {
-  LineNumber: string;
-  TransportMode: string;
-  DefaultTransportMode: string;
-  TransportModeCode: string;
-  LineTypeId: number;
-  NumStops: number;
-  Stops: Stop[];
-  TransportAuthorityName: string;
-  GeometryRevisionId: number;
-  LastModifiedUtcDateTime: string;
-  ExistsFromDate: string;
-}
+import { Stop, Line } from "../types";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
