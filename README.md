@@ -6,7 +6,6 @@ SL Stops Explorer is a web application that displays the names of every bus stop
 
 - Backend: Node.js, Express, and TypeScript
 - Frontend: React, React Hooks, TypeScript, and Material-UI
-- Test: Jest
 
 ## API
 
